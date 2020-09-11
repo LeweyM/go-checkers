@@ -34,17 +34,22 @@ func Test_board_get(t *testing.T) {
 func Test_checkersBoard_remove(t *testing.T) {
 	type args struct {
 		i,j int
+		piece Piece
 	}
 	tests := []struct {
 		args args
 	}{
-		{args{1, 0}},
+		{args{1, 0, RED}},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%d,%d should be removed", tt.args.i, tt.args.j), func(t *testing.T) {
 			b := NewBoard()
 			if b.remove(tt.args.i, tt.args.j); b.get(tt.args.i, tt.args.j) != EMPTY {
 				t.Errorf("%d,%d should be EMPTY", tt.args.i, tt.args.j)
+			}
+
+			if b.add(tt.args.i, tt.args.j, tt.args.piece); b.get(tt.args.i, tt.args.j) != tt.args.piece {
+				t.Errorf("%d,%d should be %v", tt.args.i, tt.args.j, tt.args.piece)
 			}
 		})
 	}
