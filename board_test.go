@@ -31,7 +31,7 @@ func Test_board_get(t *testing.T) {
 	}
 }
 
-func Test_checkersBoard_remove(t *testing.T) {
+func Test_checkersBoard_remove_and_add(t *testing.T) {
 	type args struct {
 		i,j int
 		piece Piece
