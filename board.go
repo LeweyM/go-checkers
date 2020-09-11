@@ -8,9 +8,9 @@ const (
 	)
 
 type Board interface {
-	get(int, int) Piece
-	remove(int, int)
-	add(int, int, Piece)
+	Get(int, int) Piece
+	Remove(int, int)
+	Add(int, int, Piece)
 }
 
 //checkers implementation
@@ -18,10 +18,6 @@ type Board interface {
 type checkersBoard struct {
 	squares []byte
 	pieceMap map[Piece]byte
-}
-
-func (b *checkersBoard) add(i int, j int, piece Piece) {
-	b.squares[mapToIndex(i, j)] = b.pieceMap[piece]
 }
 
 func NewBoard() *checkersBoard {
@@ -43,8 +39,13 @@ func NewBoard() *checkersBoard {
 	}
 }
 
-func (b *checkersBoard) get(i int, j int) Piece {
-	byte := b.squares[mapToIndex(i, j)]
+//todo: boundary checks
+func (b *checkersBoard) Add(i int, j int, piece Piece) {
+	b.set(i, j, b.pieceMap[piece])
+}
+
+func (b *checkersBoard) Get(i int, j int) Piece {
+	byte := b.squares[index(i, j)]
 	if byte == 'b' {
 		return BLUE
 	} else if byte == 'r' {
@@ -54,11 +55,15 @@ func (b *checkersBoard) get(i int, j int) Piece {
 	}
 }
 
-func (b *checkersBoard) remove(i int, j int) {
-	b.squares[mapToIndex(i, j)] = ' '
+func (b *checkersBoard) Remove(i int, j int) {
+	b.set(i, j, ' ')
 }
 
-func mapToIndex(i int, j int) int {
+func (b *checkersBoard) set(i int, j int, p byte) {
+	b.squares[index(i, j)] = p
+}
+
+func index(i int, j int) int {
 	return (i / 2) + (j * 4)
 }
 
