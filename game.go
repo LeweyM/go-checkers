@@ -2,6 +2,8 @@ package checkers
 
 type Game interface {
 	Move(oldRow, oldCol, newRow, newCol int) bool
+	HasWinner() bool
+	Winner() Player
 }
 
 type game struct {

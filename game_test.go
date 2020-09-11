@@ -14,8 +14,8 @@ func Test_game(t *testing.T) {
 		want bool
 	}{
 		{args{0,0, 7, 7}, false},
-		{args{0,2, 1, 3}, true},
 		{args{0,0, 1, 1}, false},
+		{args{0,2, 1, 3}, true},
 	}
 	for _, tt := range tests {
 		testName := fmt.Sprintf("%d,%d to %d,%d should be %v", tt.args.i1, tt.args.j1, tt.args.i1, tt.args.j1, tt.want)
