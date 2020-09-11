@@ -7,47 +7,50 @@ import (
 
 func Test_game(t *testing.T) {
 	type args struct {
-		i1, j1, i2, j2 int
+		oldCol, oldRow, newCol, newRow int
 	}
 	tests := []struct {
-		args args
-		want bool
+		args    args
+		isLegal bool
 	}{
 		{args{0,0, 7, 7}, false},
 		{args{0,0, 1, 1}, false},
 		{args{0,2, 1, 3}, true},
+		{args{5,5, 4, 4}, true},
+		{args{5,5, 6, 4}, true},
+		{args{0,6, 1, 7}, false},
 	}
 	for _, tt := range tests {
-		testName := fmt.Sprintf("%d,%d to %d,%d should be %v", tt.args.i1, tt.args.j1, tt.args.i1, tt.args.j1, tt.want)
+		testName := fmt.Sprintf("%d,%d to %d,%d should be %v", tt.args.oldCol, tt.args.oldRow, tt.args.oldCol, tt.args.oldRow, tt.isLegal)
 		t.Run(testName, func(t *testing.T) {
-			oldRow, oldCol, newRow, newCol := tt.args.i1, tt.args.j1, tt.args.i2, tt.args.j2
+			oldCol, oldRow, newCol, newRow := tt.args.oldCol, tt.args.oldRow, tt.args.newCol, tt.args.newRow
 
 			board := NewBoard()
 			game := NewGame(board)
-			movingPiece := board.Get(oldRow, newRow)
+			movingPiece := board.Get(oldCol, oldRow)
 
-			result := game.Move(oldRow, oldCol, newRow, newCol); if tt.want != result {
-				t.Errorf("%d,%d to %d,%d, should be %v, got %v",
-					oldRow, oldCol, newRow, newCol, tt.want, result)
+			board.Remove(1, 7) //remove top left piece
+
+			result := game.Move(oldCol, oldRow, newCol, newRow); if tt.isLegal != result {
+				t.Errorf("%d,%d to %d,%d, should be il/legal but isn't.",
+					oldCol, oldRow, newCol, newRow)
 			}
 
-			if tt.want == false {
-				return
-			}
+			if tt.isLegal == false { return }
 
-			expectSquare(oldRow, oldCol, Empty, board, t)
-			expectSquare(newRow, newCol, movingPiece, board, t)
+			expectSquare(oldCol, oldRow, Empty, board, t)
+			expectSquare(newCol, newRow, movingPiece, board, t)
 		})
 	}
 }
 
-func expectSquare(row int, col int, expectedPiece Piece, board *checkersBoard, t *testing.T) {
-	expectSquarePiece(t, row, col, expectedPiece, board.Get(row, col))
+func expectSquare(col int, row int, expectedPiece Piece, board *checkersBoard, t *testing.T) {
+	expectSquarePiece(t, col, row, expectedPiece, board.Get(col, row))
 }
 
-func expectSquarePiece(t *testing.T, row int, col int, expected Piece, actual Piece) {
+func expectSquarePiece(t *testing.T, col int, row int, expected Piece, actual Piece) {
 	if expected != actual {
 		t.Errorf("Expected (%d,%d: %v). Got (%d,%d: %v)",
-			row, col, expected, row, col, actual)
+			col, row, expected, col, row, actual)
 	}
 }

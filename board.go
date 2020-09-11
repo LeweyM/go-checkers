@@ -8,7 +8,7 @@ const (
 	)
 
 type Board interface {
-	Get(int, int) Piece
+	Get(col, row int) Piece
 	Remove(int, int)
 	Add(int, int, Piece)
 }
@@ -64,7 +64,8 @@ func (b *checkersBoard) set(i int, j int, p byte) {
 }
 
 func index(i int, j int) int {
-	return (i / 2) + (j * 4)
+	row := 7 - j
+	return (i / 2) + (row * 4)
 }
 
 

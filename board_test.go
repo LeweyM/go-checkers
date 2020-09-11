@@ -14,10 +14,10 @@ func Test_board_get(t *testing.T) {
 		args args
 		want Piece
 	}{
-		{args{1,0}, BluePawn},
-		{args{7,2}, BluePawn},
-		{args{0,7}, RedPawn},
-		{args{0,5}, RedPawn},
+		{args{1,0}, RedPawn},
+		{args{7,2}, RedPawn},
+		{args{0,7}, BluePawn},
+		{args{0,5}, BluePawn},
 		{args{0,3}, Empty},
 		{args{0,4}, Empty},
 	}
@@ -25,7 +25,7 @@ func Test_board_get(t *testing.T) {
 		t.Run(fmt.Sprintf("%d,%d should be %v", tt.args.i, tt.args.j, tt.want), func(t *testing.T) {
 			b := NewBoard()
 			if got := b.Get(tt.args.i, tt.args.j); got != tt.want {
-				t.Errorf("Get() = %v, want %v", got, tt.want)
+				t.Errorf("Get() = %v, isLegal %v", got, tt.want)
 			}
 		})
 	}
