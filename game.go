@@ -1,19 +1,23 @@
 package checkers
 
+type PlayerColor string
+const (
+	BLUE PlayerColor = "blue"
+	RED PlayerColor = "red" 
+)
+
 type Game interface {
 	Move(oldRow, oldCol, newRow, newCol int) bool
 	HasWinner() bool
-	Winner() Player
+	Winner() PlayerColor
 }
 
 type game struct {
 	board Board
-	playerOne Player
-	playerTwo Player
 }
 
-func NewGame(board Board, playerOne Player, playerTwo Player) *game {
-	return &game{board: board, playerOne: playerOne, playerTwo: playerTwo}
+func NewGame(board Board) *game {
+	return &game{board: board}
 }
 
 func (g *game) Move(oldRow, oldCol, newRow, newCol int) bool {
@@ -35,7 +39,7 @@ func isAdjacentAndAbove(i1 int, j1 int, i2 int, j2 int) bool {
 }
 
 func (g *game) squareFree(newRow int, newCol int) bool {
-	return g.board.Get(newRow, newCol) == EMPTY
+	return g.board.Get(newRow, newCol) == Empty
 }
 
 func (g *game) move(oldRow int, oldCol int, newRow int, newCol int) {

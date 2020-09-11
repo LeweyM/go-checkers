@@ -23,7 +23,7 @@ func Test_game(t *testing.T) {
 			oldRow, oldCol, newRow, newCol := tt.args.i1, tt.args.j1, tt.args.i2, tt.args.j2
 
 			board := NewBoard()
-			game := NewGame(board, mockPlayer{}, mockPlayer{})
+			game := NewGame(board)
 			movingPiece := board.Get(oldRow, newRow)
 
 			result := game.Move(oldRow, oldCol, newRow, newCol); if tt.want != result {
@@ -35,7 +35,7 @@ func Test_game(t *testing.T) {
 				return
 			}
 
-			expectSquare(oldRow, oldCol, EMPTY, board, t)
+			expectSquare(oldRow, oldCol, Empty, board, t)
 			expectSquare(newRow, newCol, movingPiece, board, t)
 		})
 	}
@@ -51,5 +51,3 @@ func expectSquarePiece(t *testing.T, row int, col int, expected Piece, actual Pi
 			row, col, expected, row, col, actual)
 	}
 }
-
-type mockPlayer struct {}

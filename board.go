@@ -2,9 +2,9 @@ package checkers
 
 type Piece string
 const (
-	RED Piece = "red"
-	BLUE Piece = "blue"
-	EMPTY Piece = "empty"
+	RedPawn  Piece = "red"
+	BluePawn Piece = "blue"
+	Empty    Piece = "empty"
 	)
 
 type Board interface {
@@ -22,8 +22,8 @@ type checkersBoard struct {
 
 func NewBoard() *checkersBoard {
 	pieceMap := make(map[Piece]byte)
-	pieceMap[RED] = 'r'
-	pieceMap[BLUE] = 'b'
+	pieceMap[RedPawn] = 'r'
+	pieceMap[BluePawn] = 'b'
 	return &checkersBoard{
 		squares: []byte {
 			'b', 'b', 'b', 'b',
@@ -47,11 +47,11 @@ func (b *checkersBoard) Add(i int, j int, piece Piece) {
 func (b *checkersBoard) Get(i int, j int) Piece {
 	byte := b.squares[index(i, j)]
 	if byte == 'b' {
-		return BLUE
+		return BluePawn
 	} else if byte == 'r' {
-		return RED
+		return RedPawn
 	} else {
-		return EMPTY
+		return Empty
 	}
 }
 
