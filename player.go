@@ -1,5 +1,5 @@
 package checkers
 
-type Player struct {
+type Player interface {
 
 }

@@ -1,7 +1,7 @@
 package checkers
 
 type Game interface {
-
+	hasWinner() bool
 }
 
 type game struct {
