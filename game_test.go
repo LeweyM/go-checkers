@@ -29,7 +29,7 @@ func Test_game(t *testing.T) {
 
 			board := NewBoard()
 			game := NewGame(board)
-			movingPiece := board.Get(oldCol, oldRow)
+			_, movingPiece := board.Get(oldCol, oldRow)
 
 			board.Remove(1, 7) //remove top left piece
 
@@ -53,7 +53,9 @@ func Test_taking_pieces(t *testing.T) {
 	legalMove(t, game, 0, 2, 1, 3)
 	legalMove(t, game, 3, 5, 2, 4)
 	legalMove(t, game, 1, 3, 3, 5)
+	expectSquare(2, 4, Empty, board, t)
 	legalMove(t, game, 2, 6, 4, 4)
+	expectSquare(3, 5, Empty, board, t)
 }
 
 func legalMove(t *testing.T, game *game, oldCol, oldRow, newCol, newRow int) {
@@ -64,7 +66,8 @@ func legalMove(t *testing.T, game *game, oldCol, oldRow, newCol, newRow int) {
 }
 
 func expectSquare(col int, row int, expectedPiece Piece, board *checkersBoard, t *testing.T) {
-	expectSquarePiece(t, col, row, expectedPiece, board.Get(col, row))
+	_, piece := board.Get(col, row)
+	expectSquarePiece(t, col, row, expectedPiece, piece)
 }
 
 func expectSquarePiece(t *testing.T, col int, row int, expected Piece, actual Piece) {

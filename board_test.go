@@ -24,7 +24,7 @@ func Test_board_get(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%d,%d should be %v", tt.args.i, tt.args.j, tt.want), func(t *testing.T) {
 			b := NewBoard()
-			if got := b.Get(tt.args.i, tt.args.j); got != tt.want {
+			if _, got := b.Get(tt.args.i, tt.args.j); got != tt.want {
 				t.Errorf("Get() = %v, isLegal %v", got, tt.want)
 			}
 		})
@@ -45,11 +45,16 @@ func Test_checkersBoard_remove_and_add(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%d,%d should be removed", tt.args.i, tt.args.j), func(t *testing.T) {
 			b := NewBoard()
-			if b.Remove(tt.args.i, tt.args.j); b.Get(tt.args.i, tt.args.j) != Empty {
+
+			b.Remove(tt.args.i, tt.args.j)
+			_, piece := b.Get(tt.args.i, tt.args.j)
+			if piece != Empty {
 				t.Errorf("%d,%d should be Empty", tt.args.i, tt.args.j)
 			}
 
-			if b.Add(tt.args.i, tt.args.j, tt.args.piece); b.Get(tt.args.i, tt.args.j) != tt.args.piece {
+			b.Add(tt.args.i, tt.args.j, tt.args.piece)
+			_, piece = b.Get(tt.args.i, tt.args.j)
+			if piece != tt.args.piece {
 				t.Errorf("%d,%d should be %v", tt.args.i, tt.args.j, tt.args.piece)
 			}
 		})
@@ -70,12 +75,10 @@ func Test_illegal_moves(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%d,%d should be illegal", tt.args.i, tt.args.j), func(t *testing.T) {
 			b := NewBoard()
-			defer func() {
-				if r := recover(); r == nil {
-					t.Errorf("The code did not panic")
-				}
-			}()
-			b.Get(tt.args.i, tt.args.j)
+			ok, _ := b.Get(tt.args.i, tt.args.j)
+			if ok {
+				t.Errorf("should be illegal")
+			}
 		})
 	}
 }

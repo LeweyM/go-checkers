@@ -9,7 +9,7 @@ const (
 )
 
 type Board interface {
-	Get(col, row int) Piece
+	Get(col, row int) (bool, Piece)
 	Remove(int, int)
 	Add(int, int, Piece)
 }
@@ -45,16 +45,19 @@ func (b *checkersBoard) Add(i int, j int, piece Piece) {
 	b.set(i, j, b.pieceMap[piece])
 }
 
-func (b *checkersBoard) Get(i int, j int) Piece {
-	mustBeLegal(i, j)
+func (b *checkersBoard) Get(i int, j int) (bool, Piece) {
+	illegal := isIllegal(i, j)
+	if illegal {
+		return false, Empty
+	}
 
 	byte := b.squares[index(i, j)]
 	if byte == 'b' {
-		return BluePawn
+		return true, BluePawn
 	} else if byte == 'r' {
-		return RedPawn
+		return true, RedPawn
 	} else {
-		return Empty
+		return true, Empty
 	}
 }
 
@@ -66,11 +69,9 @@ func (b *checkersBoard) set(i int, j int, p byte) {
 	b.squares[index(i, j)] = p
 }
 
-func mustBeLegal(i int, j int) {
-	if (isEven(i) && !isEven(j)) ||
-		(!isEven(i) && isEven(j)) {
-		panic("illegal board request")
-	}
+func isIllegal(i int, j int) bool {
+	return (isEven(i) && !isEven(j)) ||
+		(!isEven(i) && isEven(j))
 }
 
 func isEven(i int) bool {
