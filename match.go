@@ -8,10 +8,11 @@ type match struct {
 	game Game
  	playerOne Player
 	playerTwo Player
+	currentPlayer Player
 }
 
 func NewMatch(game Game, playerOne Player, playerTwo Player) *match {
-	return &match{game: game, playerOne: playerOne, playerTwo: playerTwo}
+	return &match{game: game, playerOne: playerOne, playerTwo: playerTwo, currentPlayer: playerOne}
 }
 
 func (m *match) Play() Player {
@@ -19,7 +20,8 @@ func (m *match) Play() Player {
 		if m.game.HasWinner() {
 			return m.winner()
 		} else {
-			i1, j1, i2, j2 := m.currentPlayer().GetMove(m.game)
+			i1, j1, i2, j2 := m.getCurrentPlayer().GetMove(m.game)
+			m.switchPlayer()
 			println(i1, j1, i2, j2)
 			m.game.Move(i1, j1, i2, j2)
 		}
@@ -34,6 +36,14 @@ func (m *match) winner() Player {
 	}
 }
 
-func (m *match) currentPlayer() Player {
-	return m.playerOne
+func (m *match) getCurrentPlayer() Player {
+	return m.currentPlayer
+}
+
+func (m *match) switchPlayer() {
+	if m.currentPlayer == m.playerOne {
+		m.currentPlayer = m.playerTwo
+	} else {
+		m.currentPlayer = m.playerOne
+	}
 }

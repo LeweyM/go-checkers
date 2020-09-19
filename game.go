@@ -5,6 +5,25 @@ import (
 	"strings"
 )
 
+type Move struct {
+	origin Position
+	target Position
+}
+
+func (m Move) String() string {
+	return fmt.Sprintf("(%d, %d) -> (%d, %d)", m.origin.col, m.origin.row, m.target.col, m.target.row)
+}
+
+func NewMove(originCol, originRow, targetCol, targetRow int) *Move {
+	return &Move{origin: Position{
+		col: originCol,
+		row: originRow,
+	}, target: Position{
+		col: targetCol,
+		row: targetRow,
+	}}
+}
+
 type PlayerColor string
 
 const (
@@ -13,6 +32,7 @@ const (
 )
 
 type Direction int
+
 const (
 	UP   Direction = 1
 	DOWN Direction = -1
@@ -25,31 +45,29 @@ type Game interface {
 	HasWinner() bool
 	Winner() PlayerColor
 	PrintBoard() string
+	AvailableMoves(color PlayerColor) []Move
 }
 
 type game struct {
-	board        Board
-	moveStrategy map[Piece]PieceStrategy
+	board           Board
+	moveStrategy    map[Piece]PieceStrategy
+	playerDirection map[PlayerColor]Direction
 }
 
 func (g *game) PrintBoard() string {
 	builder := strings.Builder{}
-
 	for i := 7; i >= 0; i-- {
 		builder.WriteString(fmt.Sprintf("%d  ", i))
 		builder.WriteByte('|')
-
 		for j := 0; j <= 7; j++ {
 			builder.WriteByte(' ')
 			ok, piece := g.board.Get(j, i)
-			if !ok {
+			if !ok || piece == Empty {
 				builder.WriteByte(' ')
 			} else if piece == BluePawn {
 				builder.WriteByte('b')
 			} else if piece == RedPawn {
 				builder.WriteByte('r')
-			} else if piece == Empty {
-				builder.WriteByte(' ')
 			}
 		}
 		builder.WriteByte('|')
@@ -75,7 +93,10 @@ func NewGame(board Board) *game {
 	game := game{
 		board:        board,
 		moveStrategy: make(map[Piece]PieceStrategy),
+		playerDirection: make(map[PlayerColor]Direction),
 	}
+	game.playerDirection[BLUE] = DOWN
+	game.playerDirection[RED] = UP
 	game.moveStrategy[BluePawn] = game.pawnStrategyFactory(DOWN)
 	game.moveStrategy[RedPawn] = game.pawnStrategyFactory(UP)
 	game.moveStrategy[Empty] = func(i int, i2 int, i3 int, i4 int) bool { return false }
@@ -94,7 +115,43 @@ func (g *game) Move(oldCol, oldRow, newCol, newRow int) bool {
 	return ok
 }
 
-// private methods
+func (g *game) AvailableMoves(color PlayerColor) []Move {
+	positions := g.board.Pieces(color)
+	var moves []Move
+	for _, position := range positions {
+		possibleMoves := generatePawnMoves(position, g.playerDirection[color])
+		legalMoves := removeNonLegal(possibleMoves)
+		for _, target := range legalMoves {
+			if g.canMove(position.col, position.row, target.col, target.row) {
+				moves = append(moves, Move{
+					origin: position,
+					target: target,
+				})
+			}
+		}
+	}
+	return moves
+}
+
+func removeNonLegal(moves []Position) []Position {
+	var legalMoves []Position
+	for _, move := range moves {
+		if !illegal(move.col) && !illegal(move.row) {
+			legalMoves = append(legalMoves, move)
+		}
+	}
+	return legalMoves
+}
+
+func illegal(n int) bool { return n < 0 || n > 7 }
+
+func generatePawnMoves(position Position, direction Direction) []Position {
+	newRow := position.row + int(direction)
+	return []Position{
+		{position.col + 1, newRow},
+		{position.col - 1, newRow},
+	}
+}
 
 func (g *game) canMove(oldCol int, oldRow int, newCol int, newRow int) bool {
 	_, destination := g.board.Get(newCol, newRow)
@@ -106,7 +163,7 @@ func (g *game) canMove(oldCol int, oldRow int, newCol int, newRow int) bool {
 }
 
 func isTakingMove(col int, row int, col2 int, row2 int) bool {
-	return abs(col - col2) == 2 && abs(row - row2) == 2
+	return abs(col-col2) == 2 && abs(row-row2) == 2
 }
 
 func (g *game) move(oldCol int, oldRow int, newCol int, newRow int) {
@@ -127,7 +184,7 @@ func adjacentColumn(oldCol int, newCol int, distance int) bool {
 }
 
 func adjacentRow(newRow, oldRow, distance int, direction Direction) bool {
-	return newRow == oldRow + (distance * int(direction))
+	return newRow == oldRow+(distance*int(direction))
 }
 
 func (g *game) canCapture(oldCol, oldRow, newCol, newRow int, direction Direction) bool {
@@ -141,7 +198,6 @@ func (g *game) areEnemies(p1, p2 Piece) bool {
 	return (p1 == RedPawn && p2 == BluePawn) ||
 		(p1 == BluePawn && p2 == RedPawn)
 }
-
 func (g *game) take(col int, row int, col2 int, row2 int) {
 	g.move(col, row, col2, row2)
 	g.board.Remove((col+col2)/2, (row+row2)/2)

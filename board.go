@@ -8,10 +8,16 @@ const (
 	Empty    Piece = "empty"
 )
 
+type Position struct {
+	col int
+	row int
+}
+
 type Board interface {
 	Get(col, row int) (bool, Piece)
 	Remove(int, int)
 	Add(int, int, Piece)
+	Pieces(playerColor PlayerColor) []Position
 }
 
 //checkers implementation
@@ -19,6 +25,29 @@ type Board interface {
 type checkersBoard struct {
 	squares  []byte
 	pieceMap map[Piece]byte
+}
+
+//todo: optimise by maintaining data structure of pieces
+func (b *checkersBoard) Pieces(playerColor PlayerColor) []Position {
+	var playerPiece Piece
+	if playerColor == BLUE {
+		playerPiece = BluePawn
+	} else if playerColor == RED {
+		playerPiece = RedPawn
+	}
+
+	var piecePositions []Position
+
+	for i := 0; i <= 7; i++ {
+		for j := 0; j <= 7; j++ {
+			_, piece := b.Get(i, j)
+			if piece == playerPiece {
+				piecePositions = append(piecePositions, Position{i, j})
+			}
+		}
+	}
+
+	return piecePositions
 }
 
 func NewBoard() *checkersBoard {

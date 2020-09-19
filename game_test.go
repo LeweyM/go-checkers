@@ -58,6 +58,69 @@ func Test_taking_pieces(t *testing.T) {
 	expectSquare(3, 5, Empty, board, t)
 }
 
+func Test_available_moves(t *testing.T) {
+	board := NewBoard()
+	game := NewGame(board)
+
+	checkMoves(t, game, RED, 7, []Move{
+		*NewMove(0, 2, 1, 3),
+		*NewMove(2, 2, 1, 3),
+		*NewMove(2, 2, 3, 3),
+		*NewMove(4, 2, 3, 3),
+		*NewMove(4, 2, 5, 3),
+		*NewMove(6, 2, 5, 3),
+		*NewMove(6, 2, 7, 3),
+	})
+
+	checkMoves(t, game, BLUE, 7, []Move{
+		*NewMove(1, 5, 0, 4),
+		*NewMove(1, 5, 2, 4),
+		*NewMove(3, 5, 2, 4),
+		*NewMove(3, 5, 4, 4),
+		*NewMove(5, 5, 4, 4),
+		*NewMove(5, 5, 6, 4),
+		*NewMove(7, 5, 6, 4),
+	})
+
+	game.Move(6, 2, 7, 3)
+
+	checkMoves(t, game, RED, 8, []Move{
+		*NewMove(7, 3, 6, 4),
+	})
+}
+
+func checkMoves(t *testing.T, game *game, playerColor PlayerColor, totalExpectedMoves int, expectedMoves []Move) {
+	availableMoves := game.AvailableMoves(playerColor)
+	if len(availableMoves) != totalExpectedMoves {
+		t.Fatalf("expected 7 availableMoves, got %d. %v", len(availableMoves), availableMoves)
+	}
+	assertExpectedMoves(t, expectedMoves, availableMoves)
+}
+
+func assertExpectedMoves(t *testing.T, expectedMoves []Move, moves []Move) {
+	for _, expectedMove := range expectedMoves {
+		assertContains(t, moves, expectedMove)
+	}
+}
+
+func assertContains(t *testing.T, moves []Move, move Move) {
+	if !contains(moves, move) {
+		t.Fatalf("Available moves should contain %v. Was %v", move, moves)
+	}
+}
+
+func contains(moves []Move, move Move) bool {
+	for _, m := range moves {
+		if m.origin.col == move.origin.col &&
+			m.origin.row == move.origin.row &&
+			m.target.col == move.target.col &&
+			m.target.row == move.target.row {
+			return true
+		}
+	}
+	return false
+}
+
 func legalMove(t *testing.T, game *game, oldCol, oldRow, newCol, newRow int) {
 	ok := game.Move(oldCol, oldRow, newCol, newRow)
 	if !ok {
