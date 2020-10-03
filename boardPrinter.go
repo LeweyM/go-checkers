@@ -7,25 +7,29 @@ import (
 
 type boardPrinter struct {
 	pieces []PiecePosition
+	moves []Move
 	shape map[Piece]byte
 }
 
-func newBoardPrinter(pieces []PiecePosition) *boardPrinter {
+func newBoardPrinter(pieces []PiecePosition, moves []Move) *boardPrinter {
 	shape := map[Piece]byte{
 		BluePawn: 'b',
 		RedPawn: 'r',
 		Empty: ' ',
 	}
 
-	return &boardPrinter{pieces: pieces, shape: shape}
+	return &boardPrinter{pieces: pieces, shape: shape, moves: moves}
 }
 
 func (bp *boardPrinter) print() string {
 	var cols = [8][8]byte{}
 
 	for _, p := range bp.pieces {
-		shape := bp.shape[p.piece]
-		cols[p.position.row][p.position.col] = shape
+		cols[p.position.row][p.position.col] = bp.shape[p.piece]
+	}
+
+	for _, move := range bp.moves {
+		cols[move.target.row][move.target.col] = 'x'
 	}
 
 	builder := strings.Builder{}

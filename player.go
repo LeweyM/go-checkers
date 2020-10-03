@@ -20,7 +20,7 @@ func NewHumanPlayer(color PlayerColor) *humanPlayer {
 
 func (p humanPlayer) GetMove(g Game) (i1, j1, i2, j2 int) {
 
-	printer := newBoardPrinter(g.getPieces())
+	printer := newBoardPrinter(g.getPieces(), g.AvailableMoves(p.getColor()))
 	fmt.Print(printer.print())
 	fmt.Print("\n")
 
