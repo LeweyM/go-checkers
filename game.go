@@ -2,7 +2,6 @@ package checkers
 
 import (
 	"fmt"
-	"strings"
 )
 
 type Move struct {
@@ -44,8 +43,8 @@ type Game interface {
 	Move(oldCol, oldRow, newCol, newRow int) bool
 	HasWinner() bool
 	Winner() PlayerColor
-	PrintBoard() string
 	AvailableMoves(color PlayerColor) []Move
+	getPieces() []PiecePosition
 }
 
 type game struct {
@@ -54,31 +53,22 @@ type game struct {
 	playerDirection map[PlayerColor]Direction
 }
 
-func (g *game) PrintBoard() string {
-	builder := strings.Builder{}
-	for i := 7; i >= 0; i-- {
-		builder.WriteString(fmt.Sprintf("%d  ", i))
-		builder.WriteByte('|')
-		for j := 0; j <= 7; j++ {
-			builder.WriteByte(' ')
-			ok, piece := g.board.Get(j, i)
-			if !ok || piece == Empty {
-				builder.WriteByte(' ')
-			} else if piece == BluePawn {
-				builder.WriteByte('b')
-			} else if piece == RedPawn {
-				builder.WriteByte('r')
-			}
-		}
-		builder.WriteByte('|')
-		builder.WriteByte('\n')
+func (g *game) getPieces() []PiecePosition {
+	return append(
+		mapPositionToPiecePosition(g.board.Pieces(BLUE), BluePawn),
+		mapPositionToPiecePosition(g.board.Pieces(RED), RedPawn)...
+	)
+}
+
+func mapPositionToPiecePosition(positions []Position, piece Piece) []PiecePosition {
+	var piecePositions []PiecePosition
+	for _, position := range positions {
+		piecePositions = append(piecePositions, PiecePosition{
+			position: position,
+			piece:    piece,
+		})
 	}
-	builder.WriteString(fmt.Sprintf("    ----------------\n    "))
-	for j := 0; j <= 7; j++ {
-		builder.WriteString(fmt.Sprintf(" %d", j))
-	}
-	builder.WriteString(fmt.Sprintf("    \n"))
-	return builder.String()
+	return piecePositions
 }
 
 func (g *game) HasWinner() bool {

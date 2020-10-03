@@ -13,6 +13,11 @@ type Position struct {
 	row int
 }
 
+type PiecePosition struct {
+	position Position
+	piece Piece
+}
+
 type Board interface {
 	Get(col, row int) (bool, Piece)
 	Remove(int, int)
