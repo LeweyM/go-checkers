@@ -1,6 +1,7 @@
 package checkers
 
 import (
+	. "checkers/Model"
 	"fmt"
 	"strings"
 )
@@ -25,11 +26,11 @@ func (bp *boardPrinter) print() string {
 	var cols = [8][8]byte{}
 
 	for _, p := range bp.pieces {
-		cols[p.position.row][p.position.col] = bp.shape[p.piece]
+		cols[p.Position.Row][p.Position.Col] = bp.shape[p.Piece]
 	}
 
 	for _, move := range bp.moves {
-		cols[move.target.row][move.target.col] = 'x'
+		cols[move.Target.Row][move.Target.Col] = 'x'
 	}
 
 	builder := strings.Builder{}

@@ -1,9 +1,12 @@
 package main
 
-import "checkers"
+import (
+	"checkers"
+	"checkers/Board"
+)
 
 func main() {
-	board := checkers.NewBoard()
+	board := Board.NewBoard()
 	playerOne := checkers.NewHumanPlayer(checkers.RED)
 	playerTwo := checkers.NewDumbAIPlayer(checkers.BLUE)
 	game := checkers.NewGame(board)

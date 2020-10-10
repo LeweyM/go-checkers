@@ -1,5 +1,7 @@
 package checkers
 
+import . "checkers/Model"
+
 type dumbAIPlayer struct {
 	color PlayerColor
 }
@@ -10,8 +12,8 @@ func NewDumbAIPlayer(color PlayerColor) *dumbAIPlayer {
 
 func (d *dumbAIPlayer) GetMove(g Game) (i1, j1, i2, j2 int) {
 	moves := g.AvailableMoves(d.color)
-	origin := moves[0].origin
-	target := moves[0].target
-	return origin.col, origin.row, target.col, target.row
+	origin := moves[0].Origin
+	target := moves[0].Target
+	return origin.Col, origin.Row, target.Col, target.Row
 }
 

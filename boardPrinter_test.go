@@ -1,9 +1,13 @@
 package checkers
 
-import "testing"
+import (
+	"checkers/Board"
+	"checkers/Model"
+	"testing"
+)
 
 func Test(t *testing.T) {
-	board := NewBoard()
+	board := Board.NewBoard()
 	game := NewGame(board)
 
 	var originalPrinted =
@@ -18,7 +22,7 @@ func Test(t *testing.T) {
 		"    ----------------\n" +
 		"     0 1 2 3 4 5 6 7"
 
-	printed := newBoardPrinter(game.getPieces(), game.AvailableMoves(RED)).print()
+	printed := newBoardPrinter(game.getPieces(), game.AvailableMoves(Model.RED)).print()
 
 	if originalPrinted != printed {
 		t.Fatalf("\nexpected:" +

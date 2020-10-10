@@ -1,6 +1,7 @@
-package checkers
+package Board
 
 import (
+	. "checkers/Model"
 	"fmt"
 	"testing"
 )

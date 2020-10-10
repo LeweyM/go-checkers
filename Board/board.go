@@ -1,22 +1,6 @@
-package checkers
+package Board
 
-type Piece string
-
-const (
-	RedPawn  Piece = "red"
-	BluePawn Piece = "blue"
-	Empty    Piece = "empty"
-)
-
-type Position struct {
-	col int
-	row int
-}
-
-type PiecePosition struct {
-	position Position
-	piece Piece
-}
+import . "checkers/Model"
 
 type Board interface {
 	Get(col, row int) (bool, Piece)

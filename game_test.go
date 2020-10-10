@@ -1,6 +1,8 @@
 package checkers
 
 import (
+	"checkers/Board"
+	. "checkers/Model"
 	"fmt"
 	"testing"
 )
@@ -27,7 +29,7 @@ func Test_game(t *testing.T) {
 		t.Run(testName, func(t *testing.T) {
 			oldCol, oldRow, newCol, newRow := tt.args.oldCol, tt.args.oldRow, tt.args.newCol, tt.args.newRow
 
-			board := NewBoard()
+			board := Board.NewBoard()
 			game := NewGame(board)
 			_, movingPiece := board.Get(oldCol, oldRow)
 
@@ -47,7 +49,7 @@ func Test_game(t *testing.T) {
 }
 
 func Test_taking_pieces(t *testing.T) {
-	board := NewBoard()
+	board := Board.NewBoard()
 	game := NewGame(board)
 
 	legalMove(t, game, 0, 2, 1, 3)
@@ -59,7 +61,7 @@ func Test_taking_pieces(t *testing.T) {
 }
 
 func Test_available_moves(t *testing.T) {
-	board := NewBoard()
+	board := Board.NewBoard()
 	game := NewGame(board)
 
 	checkMoves(t, game, RED, 7, []Move{
@@ -96,7 +98,7 @@ func Test_available_moves(t *testing.T) {
 }
 
 func Test_available_moves_only_for_taking_into_free_squares(t *testing.T) {
-	board := NewBoard()
+	board := Board.NewBoard()
 	game := NewGame(board)
 
 	game.Move(0, 2, 1, 3)
@@ -135,10 +137,10 @@ func assertContains(t *testing.T, moves []Move, move Move) {
 
 func contains(moves []Move, move Move) bool {
 	for _, m := range moves {
-		if m.origin.col == move.origin.col &&
-			m.origin.row == move.origin.row &&
-			m.target.col == move.target.col &&
-			m.target.row == move.target.row {
+		if m.Origin.Col == move.Origin.Col &&
+			m.Origin.Row == move.Origin.Row &&
+			m.Target.Col == move.Target.Col &&
+			m.Target.Row == move.Target.Row {
 			return true
 		}
 	}
@@ -152,7 +154,7 @@ func legalMove(t *testing.T, game *game, oldCol, oldRow, newCol, newRow int) {
 	}
 }
 
-func expectSquare(col int, row int, expectedPiece Piece, board *checkersBoard, t *testing.T) {
+func expectSquare(col int, row int, expectedPiece Piece, board Board.Board, t *testing.T) {
 	_, piece := board.Get(col, row)
 	expectSquarePiece(t, col, row, expectedPiece, piece)
 }

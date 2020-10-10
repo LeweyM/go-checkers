@@ -1,5 +1,7 @@
 package checkers
 
+import . "checkers/Model"
+
 type Match interface {
 	Play()
 }

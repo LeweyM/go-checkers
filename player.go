@@ -2,6 +2,7 @@ package checkers
 
 import (
 	"bufio"
+	. "checkers/Model"
 	"fmt"
 	"os"
 )
