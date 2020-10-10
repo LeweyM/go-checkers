@@ -87,12 +87,36 @@ func Test_available_moves(t *testing.T) {
 	checkMoves(t, game, RED, 8, []Move{
 		*NewMove(7, 3, 6, 4),
 	})
+
+	game.Move(5, 5, 6, 4)
+
+	checkMoves(t, game, RED, 1, []Move{
+		*NewMove(7,3, 5,5),
+	})
+}
+
+func Test_available_moves_only_for_taking_into_free_squares(t *testing.T) {
+	board := NewBoard()
+	game := NewGame(board)
+
+	game.Move(0, 2, 1, 3)
+	game.Move(1, 5, 2, 4)
+
+	checkMoves(t, game, RED, 7, []Move{
+		*NewMove(1,3, 0,4),
+		*NewMove(1,1, 0,2),
+		*NewMove(2,2, 3,3),
+		*NewMove(4,2, 3,3),
+		*NewMove(4,2, 5,3),
+		*NewMove(6,2, 5,3),
+		*NewMove(6,2, 7,3),
+	})
 }
 
 func checkMoves(t *testing.T, game *game, playerColor PlayerColor, totalExpectedMoves int, expectedMoves []Move) {
 	availableMoves := game.AvailableMoves(playerColor)
 	if len(availableMoves) != totalExpectedMoves {
-		t.Fatalf("expected 7 availableMoves, got %d. %v", len(availableMoves), availableMoves)
+		t.Fatalf("expected %d availableMoves, got %d. %v", totalExpectedMoves, len(availableMoves), availableMoves)
 	}
 	assertExpectedMoves(t, expectedMoves, availableMoves)
 }

@@ -109,7 +109,22 @@ func (g *game) AvailableMoves(color PlayerColor) []Move {
 	positions := g.board.Pieces(color)
 	var moves []Move
 	for _, position := range positions {
-		possibleMoves := generatePawnMoves(position, g.playerDirection[color])
+		possibleTakes := generatePawnMovesToDistance(position, g.playerDirection[color], 2)
+		legalTakes := removeNonLegal(possibleTakes)
+		for _, target := range legalTakes {
+			if g.canCapture(position.col, position.row, target.col, target.row, g.playerDirection[color]) {
+				moves = append(moves, Move{
+					origin: position,
+					target: target,
+				})
+			}
+		}
+	}
+	if len(moves) > 0 {
+		return moves
+	}
+	for _, position := range positions {
+		possibleMoves := generatePawnMovesToDistance(position, g.playerDirection[color], 1)
 		legalMoves := removeNonLegal(possibleMoves)
 		for _, target := range legalMoves {
 			if g.canMove(position.col, position.row, target.col, target.row) {
@@ -123,6 +138,14 @@ func (g *game) AvailableMoves(color PlayerColor) []Move {
 	return moves
 }
 
+func generatePawnMovesToDistance(position Position, direction Direction, distance int) []Position {
+	newRow := position.row + int(direction)*distance
+	return []Position{
+		{position.col + (1 * distance), newRow},
+		{position.col - (1 * distance), newRow},
+	}
+}
+
 func removeNonLegal(moves []Position) []Position {
 	var legalMoves []Position
 	for _, move := range moves {
@@ -134,14 +157,6 @@ func removeNonLegal(moves []Position) []Position {
 }
 
 func illegal(n int) bool { return n < 0 || n > 7 }
-
-func generatePawnMoves(position Position, direction Direction) []Position {
-	newRow := position.row + int(direction)
-	return []Position{
-		{position.col + 1, newRow},
-		{position.col - 1, newRow},
-	}
-}
 
 func (g *game) canMove(oldCol int, oldRow int, newCol int, newRow int) bool {
 	_, destination := g.board.Get(newCol, newRow)
@@ -178,6 +193,10 @@ func adjacentRow(newRow, oldRow, distance int, direction Direction) bool {
 }
 
 func (g *game) canCapture(oldCol, oldRow, newCol, newRow int, direction Direction) bool {
+	_, destination := g.board.Get(newCol, newRow)
+	if !(destination == Empty) {
+		return false
+	}
 	inTakingRange := adjacentRow(newRow, oldRow, 2, direction) && adjacentColumn(oldCol, newCol, 2)
 	_, targetPiece := g.board.Get((oldCol+newCol)/2, (oldRow+newRow)/2)
 	_, piece := g.board.Get(oldCol, oldRow)

@@ -19,7 +19,6 @@ func NewHumanPlayer(color PlayerColor) *humanPlayer {
 }
 
 func (p humanPlayer) GetMove(g Game) (i1, j1, i2, j2 int) {
-
 	printer := newBoardPrinter(g.getPieces(), g.AvailableMoves(p.getColor()))
 	fmt.Print(printer.print())
 	fmt.Print("\n")
@@ -59,33 +58,6 @@ func (p humanPlayer) requestMove() (int, int, int, int, bool) {
 	fmt.Printf("\n(%d,%d) -> (%d,%d)\n", a, b, c, d)
 	return a, b, c, d, true
 }
-
-//func (g *game) printBoard() string {
-//	builder := strings.Builder{}
-//	for i := 7; i >= 0; i-- {
-//		builder.WriteString(fmt.Sprintf("%d  ", i))
-//		builder.WriteByte('|')
-//		for j := 0; j <= 7; j++ {
-//			builder.WriteByte(' ')
-//			ok, piece := g.board.Get(j, i)
-//			if !ok || piece == Empty {
-//				builder.WriteByte(' ')
-//			} else if piece == BluePawn {
-//				builder.WriteByte('b')
-//			} else if piece == RedPawn {
-//				builder.WriteByte('r')
-//			}
-//		}
-//		builder.WriteByte('|')
-//		builder.WriteByte('\n')
-//	}
-//	builder.WriteString(fmt.Sprintf("    ----------------\n    "))
-//	for j := 0; j <= 7; j++ {
-//		builder.WriteString(fmt.Sprintf(" %d", j))
-//	}
-//	builder.WriteString(fmt.Sprintf("    \n"))
-//	return builder.String()
-//}
 
 func moveOk(a int, b int, c int, d int) bool {
 	return positionOk(a) && positionOk(b) && positionOk(c) && positionOk(d)

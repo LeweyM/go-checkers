@@ -21,9 +21,11 @@ func (m *match) Play() Player {
 			return m.winner()
 		} else {
 			i1, j1, i2, j2 := m.getCurrentPlayer().GetMove(m.game)
-			m.switchPlayer()
-			println(i1, j1, i2, j2)
-			m.game.Move(i1, j1, i2, j2)
+			ok := m.game.Move(i1, j1, i2, j2)
+			if ok {
+				m.switchPlayer()
+				println(i1, j1, i2, j2)
+			}
 		}
 	}
 }
