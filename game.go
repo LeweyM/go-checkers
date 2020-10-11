@@ -6,31 +6,41 @@ import (
 	"checkers/Strategy"
 )
 
-func NewMove(originCol, originRow, targetCol, targetRow int) *Move {
-	return &Move{Origin: Position{
-		Col: originCol,
-		Row: originRow,
-	}, Target: Position{
-		Col: targetCol,
-		Row: targetRow,
-	}}
-}
-
 type Game interface {
 	Move(oldCol, oldRow, newCol, newRow int) bool
 	HasWinner() bool
 	Winner() PlayerColor
 	AvailableMoves(color PlayerColor) []Move
-	getPieces() []PiecePosition
+	GetPieces() []PiecePosition
+	CurrentPlayer() PlayerColor
 }
 
 type game struct {
 	board           Board.Board
 	playerDirection map[PlayerColor]Direction
 	strategy        map[Piece]Strategy.PieceStrategy
+	currentPlayer	PlayerColor
 }
 
-func (g *game) getPieces() []PiecePosition {
+func NewGame(board Board.Board) *game {
+	game := game{
+		board:        board,
+		strategy: make(map[Piece]Strategy.PieceStrategy),
+		playerDirection: make(map[PlayerColor]Direction),
+		currentPlayer: RED,
+	}
+	game.playerDirection[BLUE] = DOWN
+	game.playerDirection[RED] = UP
+	game.strategy[BluePawn] = Strategy.NewPawnStrategy(board, DOWN)
+	game.strategy[RedPawn] = Strategy.NewPawnStrategy(board, UP)
+	return &game
+}
+
+func (g *game) CurrentPlayer() PlayerColor {
+	return g.currentPlayer
+}
+
+func (g *game) GetPieces() []PiecePosition {
 	return append(
 		mapPositionToPiecePosition(g.board.Pieces(BLUE), BluePawn),
 		mapPositionToPiecePosition(g.board.Pieces(RED), RedPawn)...
@@ -56,45 +66,66 @@ func (g *game) Winner() PlayerColor {
 	return BLUE
 }
 
-func NewGame(board Board.Board) *game {
-	game := game{
-		board:        board,
-		strategy: make(map[Piece]Strategy.PieceStrategy),
-		playerDirection: make(map[PlayerColor]Direction),
-	}
-	game.playerDirection[BLUE] = DOWN
-	game.playerDirection[RED] = UP
-	game.strategy[BluePawn] = Strategy.NewPawnStrategy(board, DOWN)
-	game.strategy[RedPawn] = Strategy.NewPawnStrategy(board, UP)
-	return &game
-}
-
 func (g *game) Move(oldCol, oldRow, newCol, newRow int) bool {
 	_, piece := g.board.Get(oldCol, oldRow)
-	canMove := g.strategy[piece].ValidateMove(oldCol, oldRow, newCol, newRow); if canMove {
-		g.move(oldCol, oldRow, newCol, newRow); return true
+	strategy := g.strategy[piece]
+	canMove := strategy.ValidateMove(oldCol, oldRow, newCol, newRow); if canMove {
+		g.move(oldCol, oldRow, newCol, newRow);
+		switchPlayer(g)
+		return true
 	}
-	canTake := g.strategy[piece].ValidateTake(oldCol, oldRow, newCol, newRow); if canTake {
-		g.take(oldCol, oldRow, newCol, newRow); return true
+	canTake := strategy.ValidateTake(oldCol, oldRow, newCol, newRow); if canTake {
+		g.take(oldCol, oldRow, newCol, newRow)
+		if len(generateTakes([]Position{{Col: newCol, Row: newRow}}, g)) == 0 {
+			switchPlayer(g)
+		}
+		return true
 	}
 	return false
 }
 
+func (g *game) move(oldCol int, oldRow int, newCol int, newRow int) {
+	_, originalPiece := g.board.Get(oldCol, oldRow)
+	g.board.Add(newCol, newRow, originalPiece)
+	g.board.Remove(oldCol, oldRow)
+}
+
+func switchPlayer(g *game) {
+	if g.currentPlayer == BLUE { g.currentPlayer = RED
+	} else { g.currentPlayer = BLUE}
+}
+
+func (g *game) take(col int, row int, col2 int, row2 int) {
+	g.move(col, row, col2, row2)
+	g.board.Remove((col+col2)/2, (row+row2)/2)
+}
+
 func (g *game) AvailableMoves(color PlayerColor) []Move {
 	positions := g.board.Pieces(color)
+	moves := generateTakes(positions, g)
+	if len(moves) > 0 {
+		return moves
+	}
+	takes := generateMoves(positions, g)
+	return append(moves, takes...)
+}
+
+func generateMoves(positions []Position, g *game) []Move {
+	var moves []Move
+	for _, position := range positions {
+		_, piece := g.board.Get(position.Col, position.Row)
+		strategy := g.strategy[piece]
+		moves = append(moves, generate(position, strategy.GenerateMoves, strategy.ValidateMove)...)
+	}
+	return moves
+}
+
+func generateTakes(positions []Position, g *game) []Move {
 	var moves []Move
 	for _, position := range positions {
 		_, piece := g.board.Get(position.Col, position.Row)
 		strategy := g.strategy[piece]
 		moves = append(moves, generate(position, strategy.GenerateTakes, strategy.ValidateTake)...)
-	}
-	if len(moves) > 0 {
-		return moves
-	}
-	for _, position := range positions {
-		_, piece := g.board.Get(position.Col, position.Row)
-		strategy := g.strategy[piece]
-		moves = append(moves, generate(position, strategy.GenerateMoves, strategy.ValidateMove)...)
 	}
 	return moves
 }
@@ -111,15 +142,4 @@ func generate(position Position, generator func(Position) []Position, validator 
 		}
 	}
 	return moves
-}
-
-func (g *game) move(oldCol int, oldRow int, newCol int, newRow int) {
-	_, originalPiece := g.board.Get(oldCol, oldRow)
-	g.board.Add(newCol, newRow, originalPiece)
-	g.board.Remove(oldCol, oldRow)
-}
-
-func (g *game) take(col int, row int, col2 int, row2 int) {
-	g.move(col, row, col2, row2)
-	g.board.Remove((col+col2)/2, (row+row2)/2)
 }

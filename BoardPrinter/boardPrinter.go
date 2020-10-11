@@ -1,4 +1,4 @@
-package checkers
+package BoardPrinter
 
 import (
 	. "checkers/Model"
@@ -12,7 +12,7 @@ type boardPrinter struct {
 	shape map[Piece]byte
 }
 
-func newBoardPrinter(pieces []PiecePosition, moves []Move) *boardPrinter {
+func NewBoardPrinter(pieces []PiecePosition, moves []Move) *boardPrinter {
 	shape := map[Piece]byte{
 		BluePawn: 'b',
 		RedPawn: 'r',
@@ -22,7 +22,7 @@ func newBoardPrinter(pieces []PiecePosition, moves []Move) *boardPrinter {
 	return &boardPrinter{pieces: pieces, shape: shape, moves: moves}
 }
 
-func (bp *boardPrinter) print() string {
+func (bp *boardPrinter) Print() string {
 	var cols = [8][8]byte{}
 
 	for _, p := range bp.pieces {
@@ -30,7 +30,7 @@ func (bp *boardPrinter) print() string {
 	}
 
 	for _, move := range bp.moves {
-		cols[move.Target.Row][move.Target.Col] = 'x'
+		cols[move.Target.Row][move.Target.Col] = '.'
 	}
 
 	builder := strings.Builder{}

@@ -17,6 +17,16 @@ type Move struct {
 	Target Position
 }
 
+func NewMove(originCol, originRow, targetCol, targetRow int) *Move {
+	return &Move{Origin: Position{
+		Col: originCol,
+		Row: originRow,
+	}, Target: Position{
+		Col: targetCol,
+		Row: targetRow,
+	}}
+}
+
 func (m Move) String() string {
 	return fmt.Sprintf("(%d, %d) -> (%d, %d)", m.Origin.Col, m.Origin.Row, m.Target.Col, m.Target.Row)
 }

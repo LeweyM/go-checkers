@@ -115,6 +115,38 @@ func Test_available_moves_only_for_taking_into_free_squares(t *testing.T) {
 	})
 }
 
+func Test_double_jumping(t *testing.T) {
+	board := Board.NewBoard()
+	game := Game(NewGame(board))
+
+	assertPlayerColor(t, game, RED)
+	game.Move(6, 2, 5, 3)
+	assertPlayerColor(t, game, BLUE)
+	game.Move(1, 5, 0, 4)
+	assertPlayerColor(t, game, RED)
+	game.Move(5, 1, 6, 2)
+	assertPlayerColor(t, game, BLUE)
+	game.Move(3, 5, 2, 4)
+	assertPlayerColor(t, game, RED)
+	game.Move(0, 6, 1, 5)
+	assertPlayerColor(t, game, BLUE)
+	game.Move(1, 7, 0, 6)
+	assertPlayerColor(t, game, RED)
+	game.Move(5, 3, 4, 4)
+	assertPlayerColor(t, game, BLUE)
+	game.Move(5, 5, 3, 3)
+
+	// should double jump here
+	assertPlayerColor(t, game, BLUE)
+}
+
+func assertPlayerColor(t *testing.T, game Game, expectedColor PlayerColor) {
+	actualColor := game.CurrentPlayer()
+	if actualColor != expectedColor {
+		t.Fatalf("expected %v but was %v", expectedColor, actualColor)
+	}
+}
+
 func checkMoves(t *testing.T, game *game, playerColor PlayerColor, totalExpectedMoves int, expectedMoves []Move) {
 	availableMoves := game.AvailableMoves(playerColor)
 	if len(availableMoves) != totalExpectedMoves {

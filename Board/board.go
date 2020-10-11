@@ -1,6 +1,9 @@
 package Board
 
-import . "checkers/Model"
+import (
+	"checkers/BoardPrinter"
+	. "checkers/Model"
+)
 
 type Board interface {
 	Get(col, row int) (bool, Piece)
@@ -9,11 +12,27 @@ type Board interface {
 	Pieces(playerColor PlayerColor) []Position
 }
 
-//checkers implementation
-
 type checkersBoard struct {
 	squares  []byte
 	pieceMap map[Piece]byte
+}
+
+func (b *checkersBoard) String() string {
+	return BoardPrinter.NewBoardPrinter(
+		append(
+			mapPositionToPiecePosition(b.Pieces(RED), RedPawn),
+			mapPositionToPiecePosition(b.Pieces(BLUE), BluePawn)...), []Move{}).Print()
+}
+
+func mapPositionToPiecePosition(positions []Position, piece Piece) []PiecePosition {
+	var piecePositions []PiecePosition
+	for _, position := range positions {
+		piecePositions = append(piecePositions, PiecePosition{
+			Position: position,
+			Piece:    piece,
+		})
+	}
+	return piecePositions
 }
 
 //todo: optimise by maintaining data structure of pieces

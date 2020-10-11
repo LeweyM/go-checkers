@@ -2,6 +2,7 @@ package checkers
 
 import (
 	"bufio"
+	"checkers/BoardPrinter"
 	. "checkers/Model"
 	"fmt"
 	"os"
@@ -20,8 +21,8 @@ func NewHumanPlayer(color PlayerColor) *humanPlayer {
 }
 
 func (p humanPlayer) GetMove(g Game) (i1, j1, i2, j2 int) {
-	printer := newBoardPrinter(g.getPieces(), g.AvailableMoves(p.getColor()))
-	fmt.Print(printer.print())
+	printer := BoardPrinter.NewBoardPrinter(g.GetPieces(), g.AvailableMoves(p.getColor()))
+	fmt.Print(printer.Print())
 	fmt.Print("\n")
 
 	availableMoves := g.AvailableMoves(p.getColor())

@@ -25,7 +25,6 @@ func (m *match) Play() Player {
 			i1, j1, i2, j2 := m.getCurrentPlayer().GetMove(m.game)
 			ok := m.game.Move(i1, j1, i2, j2)
 			if ok {
-				m.switchPlayer()
 				println(i1, j1, i2, j2)
 			}
 		}
@@ -41,7 +40,12 @@ func (m *match) winner() Player {
 }
 
 func (m *match) getCurrentPlayer() Player {
-	return m.currentPlayer
+	playerColor := m.game.CurrentPlayer()
+	if playerColor == RED {
+		return m.playerOne
+	} else {
+		return m.playerTwo
+	}
 }
 
 func (m *match) switchPlayer() {
