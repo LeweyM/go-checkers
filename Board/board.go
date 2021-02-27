@@ -1,6 +1,7 @@
 package Board
 
 import (
+	"bytes"
 	"checkers/BoardPrinter"
 	. "checkers/Model"
 )
@@ -12,9 +13,43 @@ type Board interface {
 	Pieces(playerColor PlayerColor) []Position
 }
 
+func Compare(one *checkersBoard, two *checkersBoard) bool {
+	compare := bytes.Compare(one.squares, two.squares)
+	return compare == 0
+}
+
 type checkersBoard struct {
 	squares  []byte
 	pieceMap map[Piece]byte
+}
+
+func NewBoard() *checkersBoard {
+	pieceMap := make(map[Piece]byte)
+	pieceMap[RedPawn] = 'r'
+	pieceMap[BluePawn] = 'b'
+	return &checkersBoard{
+		squares: []byte{
+			'b', 'b', 'b', 'b',
+			'b', 'b', 'b', 'b',
+			'b', 'b', 'b', 'b',
+			' ', ' ', ' ', ' ',
+			' ', ' ', ' ', ' ',
+			'r', 'r', 'r', 'r',
+			'r', 'r', 'r', 'r',
+			'r', 'r', 'r', 'r',
+		},
+		pieceMap: pieceMap,
+	}
+}
+
+func NewBoardFromPieces(pieces []byte) *checkersBoard {
+	pieceMap := make(map[Piece]byte)
+	pieceMap[RedPawn] = 'r'
+	pieceMap[BluePawn] = 'b'
+	return &checkersBoard{
+		squares: pieces,
+		pieceMap: pieceMap,
+	}
 }
 
 func (b *checkersBoard) String() string {
@@ -58,27 +93,8 @@ func (b *checkersBoard) Pieces(playerColor PlayerColor) []Position {
 	return piecePositions
 }
 
-func NewBoard() *checkersBoard {
-	pieceMap := make(map[Piece]byte)
-	pieceMap[RedPawn] = 'r'
-	pieceMap[BluePawn] = 'b'
-	return &checkersBoard{
-		squares: []byte{
-			'b', 'b', 'b', 'b',
-			'b', 'b', 'b', 'b',
-			'b', 'b', 'b', 'b',
-			' ', ' ', ' ', ' ',
-			' ', ' ', ' ', ' ',
-			'r', 'r', 'r', 'r',
-			'r', 'r', 'r', 'r',
-			'r', 'r', 'r', 'r',
-		},
-		pieceMap: pieceMap,
-	}
-}
-
 //todo: boundary checks
-func (b *checkersBoard) Add(i int, j int, piece Piece) {
+func (b *checkersBoard)  Add(i int, j int, piece Piece) {
 	b.set(i, j, b.pieceMap[piece])
 }
 

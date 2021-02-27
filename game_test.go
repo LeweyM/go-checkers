@@ -140,6 +140,25 @@ func Test_double_jumping(t *testing.T) {
 	assertPlayerColor(t, game, BLUE)
 }
 
+func Test_king_conversion(t *testing.T) {
+	board := Board.NewBoardFromPieces([]byte{
+		'b', ' ', ' ', ' ',
+		' ', ' ', ' ', 'r',
+		' ', ' ', ' ', ' ',
+		' ', ' ', ' ', ' ',
+		' ', ' ', ' ', ' ',
+		' ', ' ', ' ', ' ',
+		' ', ' ', ' ', ' ',
+		' ', ' ', ' ', ' ',
+	})
+	game := NewGame(board)
+	game.Move(6,6, 7, 7)
+
+	checkMoves(t, game, RED, 1, []Move{
+		*NewMove(7, 7, 6, 6),
+	})
+}
+
 func assertPlayerColor(t *testing.T, game Game, expectedColor PlayerColor) {
 	actualColor := game.CurrentPlayer()
 	if actualColor != expectedColor {

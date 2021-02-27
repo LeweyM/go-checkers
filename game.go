@@ -24,15 +24,17 @@ type game struct {
 
 func NewGame(board Board.Board) *game {
 	game := game{
-		board:        board,
-		strategy: make(map[Piece]Strategy.PieceStrategy),
+		board:           board,
+		strategy:        make(map[Piece]Strategy.PieceStrategy),
 		playerDirection: make(map[PlayerColor]Direction),
-		currentPlayer: RED,
+		currentPlayer:   RED,
 	}
 	game.playerDirection[BLUE] = DOWN
 	game.playerDirection[RED] = UP
 	game.strategy[BluePawn] = Strategy.NewPawnStrategy(board, DOWN)
 	game.strategy[RedPawn] = Strategy.NewPawnStrategy(board, UP)
+	game.strategy[RedKing] = Strategy.NewKingStrategy(board)
+	game.strategy[BlueKing] = Strategy.NewKingStrategy(board)
 	return &game
 }
 
@@ -70,7 +72,7 @@ func (g *game) Move(oldCol, oldRow, newCol, newRow int) bool {
 	_, piece := g.board.Get(oldCol, oldRow)
 	strategy := g.strategy[piece]
 	canMove := strategy.ValidateMove(oldCol, oldRow, newCol, newRow); if canMove {
-		g.move(oldCol, oldRow, newCol, newRow);
+		g.move(oldCol, oldRow, newCol, newRow)
 		switchPlayer(g)
 		return true
 	}
@@ -88,6 +90,13 @@ func (g *game) move(oldCol int, oldRow int, newCol int, newRow int) {
 	_, originalPiece := g.board.Get(oldCol, oldRow)
 	g.board.Add(newCol, newRow, originalPiece)
 	g.board.Remove(oldCol, oldRow)
+	if isOnFinalRow(originalPiece, newRow) {
+		g.board.Add(newCol, newRow, Piece.Promote(originalPiece))
+	}
+}
+
+func isOnFinalRow(piece Piece, row int) bool {
+	return true
 }
 
 func switchPlayer(g *game) {

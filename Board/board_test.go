@@ -83,3 +83,12 @@ func Test_illegal_moves(t *testing.T) {
 		})
 	}
 }
+
+func Test_board_equality(t *testing.T) {
+	boardOne := NewBoard()
+	boardTwo := NewBoard()
+
+	if Compare(boardOne, boardTwo) == false {
+		t.Fatalf("%s and %s should be equal but are not.", boardOne.String(), boardTwo.String())
+	}
+}

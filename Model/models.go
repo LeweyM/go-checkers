@@ -32,7 +32,16 @@ func (m Move) String() string {
 }
 
 type Piece string
+
+func (p Piece) Promote() Piece {
+	if p == RedPawn { return RedKing
+	} else if p == BluePawn { return BlueKing
+	} else { return p }
+}
+
 const (
+	BlueKing  Piece = "blueKing"
+	RedKing  Piece = "redKing"
 	RedPawn  Piece = "red"
 	BluePawn Piece = "blue"
 	Empty    Piece = "empty"
